@@ -101,7 +101,7 @@ for item in item_data:
 
 data['weather'] = weather_data
 db_connecting(db_user, db_password)
-cursor.execute("INSERT INTO weather_user_db(time, state, sky, tmp) VALUES ('"+str(now.hour)+str(now.minute)+"', '"+
+cursor.execute("INSERT INTO weather_user_db(now_time, state, sky, tmp) VALUES ('"+str(now.hour)+str(now.minute)+"', '"+
                weather_data['상태']+"', '"+weather_data['하늘']+"', '"+weather_data['기온']+"')")
 db.commit()
 db.close()

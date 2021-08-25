@@ -6,10 +6,14 @@ from datetime import datetime
 import json
 import pymysql
 import pandas as pd
+import weather_local
 
 # DB 접근 설정
 db_user = "root"
 db_password = "qwe123"
+
+# user의 지역 x, y좌표 따기
+x, y = weather_local.find_user_location()
 
 ##################################################### DB 접속 함수
 def db_connecting(id, key):
@@ -41,8 +45,10 @@ params = '?' + urlencode({
     quote_plus('base_date'): str(today_date),
     # quote_plus('base_time'): '1500',
     quote_plus('base_time'): str(today_hour)+today_minute,
-    quote_plus('nx'): '59',
-    quote_plus('ny'): '125'
+    # quote_plus('nx'): '59',
+    # quote_plus('ny'): '125'
+    quote_plus('nx'): x,
+    quote_plus('ny'): y
 })
 #####################################################
 
@@ -58,8 +64,8 @@ item_data = data['response']['body']['items']['item']
 weather_data = dict() # 테이블에 넣을 데이터로우
 
 # Pandas_DataFrame으로 출력
-table = pd.DataFrame(data['response']['body']['items']['item'])
-print(table)
+# table = pd.DataFrame(data['response']['body']['items']['item'])
+# print(table)
 
 ##################################################### 테이블에 넣을 데이터 정제
 for item in item_data:
@@ -92,7 +98,8 @@ for item in item_data:
 
 
 db_connecting(db_user, db_password)
-cursor.execute("INSERT INTO weather_user_db(now_time, tmp, state, rainfall, humidity) VALUES ('"+str(now.hour)+str(now.minute)+
+cursor.execute("INSERT INTO weather_user_db(now_date, now_time, tmp, state, rainfall, humidity) VALUES "
+               "('"+today_date+"', '"+str(now.hour)+str(now.minute)+
                "', '"+weather_data['기온']+"', '"+weather_data['상태']+
                "', '"+weather_data['강수량']+"', '"+weather_data['습도']+"')")
 
